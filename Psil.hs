@@ -244,9 +244,12 @@ s2l (Scons (Ssym funcName) arg) =
 
 --Curring
 s2l (Scons (Lapp name arg1) arg2) =
-    Lapp (Lapp name arg1) arg2
+    Lapp name (arg1 (s2l arg2) )
 
 
+
+
+(Lapp + 2) 3
 
 ((x exp) exp)
 
