@@ -222,9 +222,10 @@ s2t :: Sexp -> Ltype
 s2t (Ssym "Int") = Lint
 s2t (Scons e1 e2) = Lawr (st2 e1) (st2 e2)
 s2t (e1 (Ssym "->")) = st2 e1
+st2 (Ssym "->") = error "Nombre d'argument illegal / pas d'argument"
 
--- Int Int -> Int
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
+
 
 
 s2l :: Sexp -> Lexp
