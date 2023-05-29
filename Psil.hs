@@ -32,6 +32,10 @@ data Sexp = Snil                        -- La liste vide
 --                            (Snum 2))
 --                     (Snum 3)
 --                   
+
+
+-- (Int) (Int -> Int)
+
 -- (/ (* (- 68 32) 5) 9)
 --     ==  (((() . /) . (((() . *) . (((() . -) . 68) . 32)) . 5)) . 9)
 --     ==>
@@ -154,6 +158,8 @@ instance Read Sexp where
                       Left _ -> []
                       Right e -> [(e,"")]
 
+
+case of Sexp
 ---------------------------------------------------------------------------
 -- Sexp Pretty Printer                                                   --
 ---------------------------------------------------------------------------
@@ -214,27 +220,10 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 -- ¡¡COMPLÉTER ICI!!
 s2t (Ssym "Int") = Lint
--- the only operations here are on ints and return ints, + - / *
---s2t (Ssym _ ) = Larw Lint Lint
--- Autre cas de Ltype, -> Larw Ltype Ltype; Ltype->Ltype == Lint -> Lint, Lint -> (Lint -> Lint)...
--- il faut donc utiliser recursivement au cas de base jusqua ce que Int -> Int devienne Lint -> Lint
--- ou Int -> (Int -> Int) devienne Lint -> (Lint -> Lint)...
+s2t (Scons e1 e2) = Lawr (st2 e1) (st2 e2)
+s2t (e1 (Ssym "->")) = st2 e1
 
---not really working but for eg cons(Ssym(*) (Snum 5)) cons(cons(Ssym +) (Snum 8)) Snum 6) ==> 5*(8+6) ==> LInt -> (LInt-> LInt) -> LInt
--- and this would be Lint-> Larw Lint Lint -> Lint
-
--- or are we just trying to convert 
--- (int -> int) -> int to Larw Lint Lint -> Lint 
--- Lawr (Lawr Lint Lint) Lint, which is Ltype
-
-s2t Sexp (x:xs) =
-    case x of
-    -- si (Int, Int) = Larw Lint Lint
-    | x == Ssym "Int" = Larw Lint (s2t xs)
-    -- else if x = une autre paire Larw, (Int, Int) Int...
-    | otherwise = Larw Larw (Lint Lint) (s2t xs)
-
--- dans le cas ou Ssym n'est pas un type connu eg "String"
+-- Int Int -> Int
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
 
@@ -247,6 +236,9 @@ s2l (Ssym s) = Lvar s
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
 s2d :: Sexp -> Ldec
+
+
+
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
 -- ¡¡COMPLÉTER ICI!!
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
