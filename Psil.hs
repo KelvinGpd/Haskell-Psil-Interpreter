@@ -232,6 +232,12 @@ s2l :: Sexp -> Lexp
 s2l (Snum n) = Lnum n
 s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
+s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym v)) e) =
+        Lfun (s2l v) (s2l e)
+s2l Scons (Scons Snil (Ssym funcName)) (expression1) = 
+    Lapp 
+
+(sum 2 3)
 
 
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
