@@ -246,7 +246,6 @@ s2l (Scons exp1 exp2) =
     Lapp (s2l exp1) (s2l exp2)
 
 
-
 --Llet
 s2l (Scons ((Ssym "let") Scons((Ssym v) value)) exp)=
     Llet (s2l v) (s2l value) (s2l exp)
@@ -255,18 +254,19 @@ s2l (Scons ((Ssym "let") Scons((Ssym v) value)) exp)=
 s2l (Scons Scons((Ssym ":") val) type)=
     Lhastype s21(val) s2t(type) 
 
-
-
-
-
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
+
+
 s2d :: Sexp -> Ldec
-
-
-
-s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = Ldef v (s2l e)
+s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = 
+    case e of
+    |e == Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e = 
+    |otherwise = Ldef v (s2l e)
 -- ¡¡COMPLÉTER ICI!!
+s2d (Scons (Ssym v) type) = Ldec v (s2t type)
+s2d (())
+
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
 ---------------------------------------------------------------------------
