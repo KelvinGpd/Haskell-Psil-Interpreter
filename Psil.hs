@@ -239,13 +239,13 @@ s2l (Scons (Scons (Ssym "fun") (Ssym v)) e) =
 
 
 --Appel de fonction
---
-s2l (Scons (type) arg) =
-    case type of
-        --base 
-        |type == Ssym funcName = Lapp (s2l funcName) (s2l arg)
-        --curring
-        |type == Lapp name arg1 = Lapp name (arg1 (s2l arg2) )
+s2l Scons ((Ssym funcName) arg)=
+    Lapp (s2l funcName) (s2l arg)
+-- Currying
+s2l (Scons exp1 exp2) =
+    Lapp (s2l exp1) (s2l exp2)
+
+
 
 --Llet
 s2l (Scons ((Ssym "let") Scons((Ssym v) value)) exp)=
@@ -256,21 +256,6 @@ s2l (Scons Scons((Ssym ":") val) type)=
     Lhastype s21(val) s2t(type) 
 
 
-+ (: 2 Int)
-
-
-(: 2 Int)
---
-
-
-
-
-
-(Lapp + 2) 3
-
-((x exp) exp)
-
-(fun 2)
 
 
 
