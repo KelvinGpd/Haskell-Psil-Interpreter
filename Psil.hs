@@ -234,17 +234,34 @@ s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
 
 --Definition de fonction
-s2l (Scons (Scons (Scons (Ssym "fun") (Ssym v)) e)) =
+s2l (Scons (Scons (Ssym "fun") (Ssym v)) e) =
         Lfun (s2l v) (s2l e)
+
 
 --Appel de fonction
 --
-s2l (Scons (Ssym funcName) arg) = 
-    Lapp (s2l funcName) (s2l arg)
+s2l (Scons (type) arg) =
+    case type of
+        --base 
+        |type == Ssym funcName = Lapp (s2l funcName) (s2l arg)
+        --curring
+        |type == Lapp name arg1 = Lapp name (arg1 (s2l arg2) )
 
---Curring
-s2l (Scons (Lapp name arg1) arg2) =
-    Lapp name (arg1 (s2l arg2) )
+--Llet
+s2l (Scons ((Ssym "let") Scons((Ssym v) value)) exp)=
+    Llet (s2l v) (s2l value) (s2l exp)
+
+--Lhastype
+s2l (Scons Scons((Ssym ":") val) type)=
+    Lhastype s21(val) s2t(type) 
+
+
++ (: 2 Int)
+
+
+(: 2 Int)
+--
+
 
 
 
