@@ -261,11 +261,11 @@ s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = 
     case e of
-    |e == Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e = 
+    |e == Scons (Scons (Scons Snil (Ssym "def")) (Ssym c)) f = s2d(e) 
     |otherwise = Ldef v (s2l e)
 -- ¡¡COMPLÉTER ICI!!
 s2d (Scons (Ssym v) type) = Ldec v (s2t type)
-s2d (())
+
 
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
