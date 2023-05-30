@@ -159,7 +159,6 @@ instance Read Sexp where
                       Right e -> [(e,"")]
 
 
-case of Sexp
 ---------------------------------------------------------------------------
 -- Sexp Pretty Printer                                                   --
 ---------------------------------------------------------------------------
@@ -221,7 +220,7 @@ s2t :: Sexp -> Ltype
 -- ¡¡COMPLÉTER ICI!!
 s2t (Ssym "Int") = Lint
 s2t (Scons e1 e2) = Lawr (st2 e1) (st2 e2)
-s2t (e1 (Ssym "->")) = st2 e1
+s2t (Scons e1 (Ssym "->")) = (st2 e1)
 st2 (Ssym "->") = error "Nombre d'argument illegal / pas d'argument"
 
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
@@ -239,7 +238,7 @@ s2l (Scons (Scons (Ssym "fun") (Ssym v)) e) =
 
 
 --Appel de fonction
-s2l Scons ((Ssym funcName) arg)=
+s2l (Scons (Ssym funcName) arg)=
     Lapp (s2l funcName) (s2l arg)
 -- Currying
 s2l (Scons exp1 exp2) =
@@ -247,12 +246,12 @@ s2l (Scons exp1 exp2) =
 
 
 --Llet
-s2l (Scons ((Ssym "let") Scons((Ssym v) value)) exp)=
-    Llet (s2l v) (s2l value) (s2l exp)
+s2l (Scons (Scons (Ssym "let") (Scons (Ssym v) value)) exp)=
+    Llet (Lvar v) (s2l value) (s2l exp)
 
 --Lhastype
-s2l (Scons Scons((Ssym ":") val) type)=
-    Lhastype s21(val) s2t(type) 
+s2l (Scons (Scons (Ssym ":") (val)) type) =
+    Lhastype (s21 val) (s2t type) 
 
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
@@ -261,11 +260,11 @@ s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = 
     case e of
-    |e == Scons (Scons (Scons Snil (Ssym "def")) (Ssym c)) f = s2d(e) 
+    |e == Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e = 
     |otherwise = Ldef v (s2l e)
 -- ¡¡COMPLÉTER ICI!!
 s2d (Scons (Ssym v) type) = Ldec v (s2t type)
-
+s2d (())
 
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
