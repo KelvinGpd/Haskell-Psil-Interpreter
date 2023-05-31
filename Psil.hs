@@ -312,6 +312,19 @@ synth tenv (Lhastype e t) =
       Just err -> error err
 -- ¡¡COMPLÉTER ICI!!
 
+--find out the Ltype return type of arg1 applied on arg 2
+synth tenv (Lapp f _) =
+    let 
+        funcType = synth tenv f --returns type of function
+    in
+        case funcType of
+            Lint -> error "not a function"
+            Larw _ returnType -> returnType
+
+--find out the Ltype of
+synth tenv (Llet _ _ _) =
+
+-- | Llet Var Lexp Lexp   Déclaration de variable locale.
 
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
