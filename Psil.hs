@@ -321,11 +321,14 @@ synth tenv (Lapp f _) =
             Lint -> error "not a function"
             Larw _ returnType -> returnType
 
---find out the Ltype of
-synth tenv (Llet _ _ _) =
+--find out the Ltype of the func
+synth tenv (Llet _ _ func) =
+    synth tenv func
 
--- | Llet Var Lexp Lexp   Déclaration de variable locale.
-
+--  | Lfun Var Lexp       -- Fonction anonyme.
+synth tenv (Lfun var func) =
+    Larw var (synth tenv func)
+    --idk how to get Ltype of var
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
