@@ -219,9 +219,9 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 s2t :: Sexp -> Ltype
 -- ¡¡COMPLÉTER ICI!!
 s2t (Ssym "Int") = Lint
-s2t (Scons e1 e2) = Lawr (st2 e1) (st2 e2)
-s2t (Scons e1 (Ssym "->")) = (st2 e1)
-st2 (Ssym "->") = error "Nombre d'argument illegal / pas d'argument"
+s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2)
+s2t (Scons e1 (Ssym "->")) = (s2t e1)
+s2t (Ssym "->") = error "Nombre d'argument illegal / pas d'argument"
 
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
 
@@ -233,25 +233,23 @@ s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
 
 --Definition de fonction
-s2l (Scons (Scons (Ssym "fun") (Ssym v)) e) =
-        Lfun (s2l v) (s2l e)
-
+s2l (Scons (Scons (Ssym "fun") (Ssym s)) e) =
+        Lfun s (s2l e)
 
 --Appel de fonction
-s2l (Scons (Ssym funcName) arg)=
-    Lapp (s2l funcName) (s2l arg)
+s2l (Scons(Scons Snil (Ssym func)) args)=
+    Lapp (Lvar func) (s2l args)
 -- Currying
 s2l (Scons exp1 exp2) =
     Lapp (s2l exp1) (s2l exp2)
 
-
 --Llet
 s2l (Scons (Scons (Ssym "let") (Scons (Ssym v) value)) exp)=
-    Llet (Lvar v) (s2l value) (s2l exp)
+    Llet v (s2l value) (s2l exp)
 
 --Lhastype
-s2l (Scons (Scons (Ssym ":") (val)) type) =
-    Lhastype (s21 val) (s2t type) 
+s2l (Scons (Scons (Ssym ":") (val)) t) =
+    Lhastype (s2l val) (s2t t) 
 
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
@@ -313,6 +311,9 @@ synth tenv (Lhastype e t) =
       Nothing -> t
       Just err -> error err
 -- ¡¡COMPLÉTER ICI!!
+
+
+
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
         
