@@ -342,7 +342,7 @@ data Value = Vnum Int
            | Vfun VEnv Var Lexp
            | Vop (Value -> Value)
 
-type VEnv = Map Var Value
+           VOP (Vfun -> Value)
 
 instance Show Value where
     showsPrec p  (Vnum n) = showsPrec p n
@@ -371,18 +371,19 @@ eval venv (Lhastype lexp ltype) =
 --
 eval venv (Lapp f arg) =
     --applies f on args and returns Vop(Value->Value)
+    --
     let 
         func = eval venv f
     --How 
     in 
         Vop()
 
+eval venv (Llet var f arg)=
 
-
-
-    
-
-    --lapp exp1 exp2
+eval venv (Lfun var exp) =
+    case exp of
+        Lapp f args ->  Vop((eval venv var) -> (eval venv f)) 
+        Lfun var2 exp2 -> Vop((eval venv var) -> (eval venv var2) -> (eval venv exp2)) 
 
 
 -- État de l'évaluateur.
