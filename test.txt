@@ -1,3 +1,5 @@
 (def r1 2)
 (def r2 +)
 (def r3 (+ 2))
+(def r4 (+ (: 2 Int)))
+(def r5 ((+ 2) 4))

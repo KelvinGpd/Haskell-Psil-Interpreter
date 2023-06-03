@@ -254,7 +254,6 @@ s2l (Scons (Scons (Ssym ":") (val)) t) =
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
 
 
-
 s2d :: Sexp -> Ldec
 s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) = 
     Ldef v (s2l e)
@@ -367,12 +366,8 @@ eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 
--- eval venv (Lhastype lexp ltype) =
+eval venv (Lhastype lexp ltype) = eval venv lexp
 
---     Vop ((eval venv lexp) -> (eval venv ltype))
-
-
--- Vop (Value -> Value)
 
 eval venv (Lapp f arg) =
     --applies f on args and returns Vfun, or Vnum 
@@ -381,7 +376,7 @@ eval venv (Lapp f arg) =
         evalArg = (eval venv arg)
     in
         case func of
-            Vop  (\ any)  -> Vop ( any evalArg )
+            Vop anyFunc -> Vop (\x -> anyFunc (evalArg))
 
 
 eval venv (Llet var val arg)= 
