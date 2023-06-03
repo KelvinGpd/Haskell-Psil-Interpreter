@@ -366,20 +366,22 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
--- eval venv (Lhastype lexp ltype) = 
+
+-- eval venv (Lhastype lexp ltype) =
+
 --     Vop ((eval venv lexp) -> (eval venv ltype))
--- --
 
 
--- eval venv (Lapp f arg) =
---     --applies f on args and returns Vop(Value->Value)
---     --
---     let 
---         func = eval venv f
---     --How 
---     in 
---         case func of
---             Vop ( \ (Vnum x) -> smt) -> eval (venv ++ [x, arg]) smt
+-- Vop (Value -> Value)
+
+eval venv (Lapp f arg) =
+    --applies f on args and returns Vfun, or Vnum 
+    let
+        func = (eval venv f) --Vop
+        evalArg = (eval venv arg)
+    in
+        case func of
+            Vop  (\ any)  -> Vop ( any evalArg )
 
 
 eval venv (Llet var val arg)= 

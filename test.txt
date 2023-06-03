@@ -1,1 +1,3 @@
-"def r1 2"
+(def r1 2)
+(def r2 +)
+(def r3 (+ 2))
