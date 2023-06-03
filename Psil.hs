@@ -366,7 +366,7 @@ eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 
-eval venv (Lhastype lexp ltype) = eval venv lexp
+--eval venv (Lhastype lexp ltype) = eval venv lexp
 
 
 eval venv (Lapp f arg) =
@@ -376,7 +376,8 @@ eval venv (Lapp f arg) =
         evalArg = (eval venv arg)
     in
         case func of
-            Vop anyFunc -> Vop (\x -> anyFunc (evalArg))
+            Vop anyFunc -> anyFunc evalArg
+            otherwise -> func
 
 
 eval venv (Llet var val arg)= 
