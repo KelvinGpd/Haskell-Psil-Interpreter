@@ -327,8 +327,8 @@ synth tenv (Llet _ _ func) =
 
 --  | Lfun Var Lexp       -- Fonction anonyme.
 synth tenv (Lfun var func) =
-    Larw var (synth tenv func)
-    --idk how to get Ltype of var
+    mlookup tenv var
+
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
@@ -337,12 +337,13 @@ synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 -- Évaluateur                                                            --
 ---------------------------------------------------------------------------
 
+type VEnv = Map Var Value
+
 -- Type des valeurs renvoyées par l'évaluateur.
 data Value = Vnum Int
            | Vfun VEnv Var Lexp
            | Vop (Value -> Value)
 
-           VOP (Vfun -> Value)
 
 instance Show Value where
     showsPrec p  (Vnum n) = showsPrec p n
@@ -365,26 +366,27 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
-eval venv (Lhastype lexp ltype) =
-    --returns Vop
-    Vop ((eval venv lexp) -> ltype) 
---
-eval venv (Lapp f arg) =
-    --applies f on args and returns Vop(Value->Value)
-    --
-    let 
-        func = eval venv f
-    --How 
-    in 
-        Vop()
+-- eval venv (Lhastype lexp ltype) = 
+--     Vop ((eval venv lexp) -> (eval venv ltype))
+-- --
 
-eval venv (Llet var f arg)=
+
+-- eval venv (Lapp f arg) =
+--     --applies f on args and returns Vop(Value->Value)
+--     --
+--     let 
+--         func = eval venv f
+--     --How 
+--     in 
+--         case func of
+--             Vop ( \ (Vnum x) -> smt) -> eval (venv ++ [x, arg]) smt
+
+
+eval venv (Llet var val arg)= 
+    eval ((var, eval venv val) : venv) arg
 
 eval venv (Lfun var exp) =
-    case exp of
-        Lapp f args ->  Vop((eval venv var) -> (eval venv f)) 
-        Lfun var2 exp2 -> Vop((eval venv var) -> (eval venv var2) -> (eval venv exp2)) 
-
+    Vop( \ (Vnum var) -> (eval venv exp))
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
