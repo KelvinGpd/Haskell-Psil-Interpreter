@@ -422,7 +422,6 @@ process_decl ((tenv,venv), Just (var, t), res) (Ldef x e) =
         venv' = minsert venv x val
     in ((tenv', venv'), Nothing, (val, t) : res)
 
-
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
 ---------------------------------------------------------------------------
