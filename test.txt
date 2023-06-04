@@ -1,6 +1,2 @@
-(def r1 2)
-(def r2 +)
-(def r3 (+ 2))
-(def r5 ((+ 2) 4))
-(def r6 (+ 2 5))  
+
 (def r7 (let ((x 5)) (* x 4)))
