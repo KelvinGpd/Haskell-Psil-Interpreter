@@ -1,2 +1,2 @@
-
-(def r7 (let ((x 5)) (* x 4)))
+(dec r6 Int)
+(def r6 (+ 2 5))

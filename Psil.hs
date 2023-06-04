@@ -262,7 +262,6 @@ s2d (Scons (Scons (Scons Snil (Ssym "def")) (Ssym v)) e) =
     Ldef v (s2l e)
 s2d (Scons (Scons (Scons Snil (Ssym "dec")) (Ssym v)) e) = 
     Ldec v (s2t e)
--- ¡¡COMPLÉTER ICI!!
 
 s2d se = error ("Déclaration Psil inconnue: " ++ showSexp se)
 
@@ -408,7 +407,15 @@ process_decl ((tenv, venv), Nothing, res) (Ldef x e) =
         val = eval venv e
         venv' = minsert venv x val
     in ((tenv', venv'), Nothing, (val, ltype) : res)
--- ¡¡COMPLÉTER ICI!!
+
+process_decl ((tenv,venv), Just (var, t), res) (Ldef x e) =
+     let 
+        tenv' = minsert tenv x t
+        --On evalue directement e car statique
+        val = eval venv e
+        venv' = minsert venv x val
+    in ((tenv', venv'), Nothing, (val, t) : res)
+
 
 ---------------------------------------------------------------------------
 -- Toplevel                                                              --
