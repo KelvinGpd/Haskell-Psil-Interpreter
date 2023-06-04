@@ -218,9 +218,14 @@ data Ldec = Ldec Var Ltype      -- Déclaration globale.
 
 s2t :: Sexp -> Ltype
 -- ¡¡COMPLÉTER ICI!!
+s2t (Scons (Scons e1 (Ssym "->")) e2) = Larw (s2t e1) (s2t e2) 
+
 s2t (Ssym "Int") = Lint
+s2t (Scons Snil (Ssym "Int")) = Lint
 s2t (Scons e1 e2) = Larw (s2t e1) (s2t e2)
-s2t (Scons e1 (Ssym "->")) = (s2t e1)
+
+
+--s2t (Scons e1 (Ssym "->")) = (s2t e1)
 s2t (Ssym "->") = error "Nombre d'argument illegal / pas d'argument"
 
 s2t se = error ("Type Psil inconnu: " ++ (showSexp se))
@@ -253,7 +258,6 @@ s2l (Scons (Scons Snil exp1) exp2) =
     Lapp (s2l exp1) (s2l exp2)
 s2l (Scons (Scons exp1 exp2) exp3) =
     Lapp (s2l (Scons exp1 exp2) ) (s2l exp3)
-
 
 
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
