@@ -243,9 +243,8 @@ s2l (Scons(Scons Snil (Ssym func)) args)=
 -- Currying
 s2l (Scons (Scons Snil exp1) exp2) =
     Lapp (s2l exp1) (s2l exp2)
-s2l (Scons (Scons Snil (Scons Snil exp1)) exp2) =
-    Lapp (s2l exp1) (s2l exp2)
-
+s2l (Scons (Scons exp1 exp2) exp3) =
+    Lapp (s2l (Scons exp1 exp2) ) (s2l exp3)
 
 --Llet
 s2l (Scons (Scons (Scons Snil (Ssym "let")) (Scons (Ssym v) value)) exp)=
