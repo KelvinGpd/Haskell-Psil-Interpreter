@@ -1,0 +1,27 @@
+(def r1 2)                                       ; ↝ 2 : Int
+(def r2 +)                                       ; ↝ <fonction> : Int -> Int -> Int
+(def r3 (+ 2))                                   ; ↝ <fonction> : Int -> Int
+
+(def r4 (+ (: 2 Int)))                           ; ↝ <fonction> : Int -> Int
+
+(def r5 ((+ 2) 4))                               ; ↝ 6 : Int
+
+(dec r6 Int)
+(def r6 (+ 2 5))                                 ; ↝ 7 : Int
+
+(def r7 (let ((x 5)) (* x 4)))                   ; ↝ 20 : Int
+
+
+(dec f1 (Int Int -> Int))
+(def f1 (fun x (fun y (+ y 5))))                 ; ↝ <fonction> : Int -> Int -> Int
+
+
+
+;;; Nos propres tests
+
+(def r8 (+ r6 r7))                          ; ↝ 27 : Int pour voir si lenvironement est bien updated
+(def r10 (+ (+ 10 20) 10))                  ;   ↝ 40 : Int
+(def r10 (- (- 10 20) 10))                  ; ↝ -20 : Int
+(def r20 (let ((y (+ 2 3))) (* y 4)))        ; ↝ 20 : Int
+(def truc (let ((+ 5)) (+ + 4)))           ; ↝ 5 : Int On peut rename la variable +
+
