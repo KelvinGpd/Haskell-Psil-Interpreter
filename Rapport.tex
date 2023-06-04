@@ -20,13 +20,6 @@
     \item Hashtype et sa signification
     Le problème ici résidait simplement dans la signification de hashtype. Est ce qu'on le considère dans process decl comme une declaration ? Non, car hashtype peut etre associé a n'importe quoi, pas seulement une variable. Notre systeme infère deja aussi les types, nous avons alors résolus que hashtype devait servir de verification, pour faire en sorte que le programmeur soit certain du type de ses arguments.
     
-    \item ajouter des :
-
-    
-    
-    
-    \item Appel de fonctions et currying:
-    En premier lieu, le problème le plus flagrant est de handle la création de fonction
      \item élaboration des tests et la fonction "run": 
      nous n'étions pas capable d'appeler la fonction run avec le path de notre fichier texte contenant les tests. Après plusieurs essais, une recherche en ligne nous a dévoilé qu'il fallait spécifier le path avec les doubles backslash, vu que haskell interprète "\" dans les chaines comme un charactère d'échappement. 
 \end{enumerate}
@@ -39,9 +32,10 @@
     \item Snil et son utilisation dans les Sexp:
     à plusieurs reprises, les erreurs de nos tests reliaient aux fonctions s2t et s2l, qui convertissait un Sexp en le sa L equivalent. Ce n'est qu'en testant avec la fonction SexpOf suivi de l'expression que nous nous sommes rendus compte que plusieurs Ssym étaient précédés d'un Snil, afin d'isoler le symbole dans le Scons. Par exemple, pour (Int Int -> Int), il n'y a rien qui nous indiquait que le premier Ssym Int devait être précéde de Nil. Pour contrer cette surprise, nous avons introduit au cas de base: s2t (Scons Snil (Ssym 'Int')). 
 
-    \item
-    
+    \item Appel de fonction par nom:
+    Nous avons réalisé plus tard avec les derniers tests que la déclaration de variables devait se faire par nom, et non par valeur. Les déclarations de variables ne marchent pas avec notre interpréteur car nous appelons eval dessus, par exemple (funcname type) se fait interpreter comme un appel de de fonction avant de se faire rajouter à l'environnement. 
 
+    
 \end{enumerate}
 
 \section*{Choix que nous avons fait:}
@@ -49,11 +43,7 @@
     \item Appel de fonctions et currying
     En premier lieu, le problème le plus flagrant est de handle la création de fonction anonymes. Mettons (+ 2) 3, une premiere étape est de créer la fonction intermediaire (+ 2). Pour cela, nous avons simplement résolu d'avoir une chaine d'appel lorsque le programme est présenté devant un Scons( exp1 exp2) qui ne match pas d'autre cas. Il fera allors un appel de (+ 2) sur 3 mais evalue (+ 2) en premier. Il va donc aller en profondeur, jusqu'a ce qu'il trouve un Syym, la fonction déja définie avec laquelle nous créons des fonctions intermediaire. C'étais aussi un aspect surprenent de ne pas avoir besoin de faire des fonctions anonymes pour des tels cas, puisque nous allons en profondeur d'abord.
     \item Valeure de Recursive et call by name
-
-
     Premièrement nous avons remarqués que dans process declaration l'environement est changé seulement après avoir evalué l'expression. Nous savions donc que trouver la valeure de Recursive ne serait pas possible. Nous devions donc faire un call by name, pour que la valeure de Recursive ne soit jamais recherchée. Le problème que nous avons toujours pas résulu est comment delay l'évaluation de recursive. La solution est probablement de faire en sort que eval puisse prendre différentre types de inputs que des values. Nous avons fait ce travail derniere minute, donc n'avons pas réalisés comment implémenter un call by name.
-    
-
     
 \end{enumerate}
 
@@ -68,6 +58,8 @@
     \item Nous avons appris à s'adapter à du code complexe sans documentation. C'est quaisiment en sorte du reverse engineering. Bien que le code était bien commenté, nous étions impatient de nous même ecrire, et donc nous réalisions certaines choses trop tard. 
 
     \item Nous avons appris comment fonctionnaient les parsers, et comment les compilateurs
+
+    \item Nous avons appris la structure générale d'un interpréteur et les différentes étapes requises afin d'évaluer une expression d'un language quelconque.
     
 \end{enumerate}
 
