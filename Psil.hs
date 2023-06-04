@@ -233,22 +233,26 @@ s2l (Ssym s) = Lvar s
 -- ¡¡COMPLÉTER ICI!!
 
 --Definition de fonction
-s2l (Scons (Scons (Ssym "fun") (Ssym s)) e) =
+s2l (Scons (Scons (Scons Snil (Ssym "fun")) (Ssym s)) e) =
         Lfun s (s2l e)
 
 --Appel de fonction
 s2l (Scons(Scons Snil (Ssym func)) args)=
     Lapp (Lvar func) (s2l args)
+
 -- Currying
 s2l (Scons (Scons Snil exp1) exp2) =
     Lapp (s2l exp1) (s2l exp2)
+s2l (Scons (Scons Snil (Scons Snil exp1)) exp2) =
+    Lapp (s2l exp1) (s2l exp2)
+
 
 --Llet
-s2l (Scons (Scons (Ssym "let") (Scons (Ssym v) value)) exp)=
+s2l (Scons (Scons (Scons Snil (Ssym "let")) (Scons (Ssym v) value)) exp)=
     Llet v (s2l value) (s2l exp)
 
 --Lhastype
-s2l (Scons (Scons (Ssym ":") (val)) t) =
+s2l (Scons (Scons (Scons Snil (Ssym ":")) val) t) =
     Lhastype (s2l val) (s2t t) 
 
 s2l se = error ("Expression Psil inconnue: " ++ (showSexp se))
@@ -366,7 +370,7 @@ eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 -- ¡¡COMPLÉTER ICI!!
 
---eval venv (Lhastype lexp ltype) = eval venv lexp
+eval venv (Lhastype lexp ltype) = eval venv lexp
 
 
 eval venv (Lapp f arg) =
@@ -444,3 +448,4 @@ typeOf = synth tenv0 . lexpOf
 
 valOf :: String -> Value
 valOf = eval venv0 . lexpOf
+
