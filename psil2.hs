@@ -299,7 +299,17 @@ sf_fun _ x = error ("devrait être un identifiant: " ++ showSexp x)
 sf_if :: SpecialForm
 sf_if _venv _sc =  error "¡¡COMPLÉTER!! sf_if"
 
+--fonction auxilliaire 
+extract_args_let :: Sexp -> (String, Lexp)
+extract_args_let (Scons Snil (Scons (Scons Snil (Ssym var)) (Snum val))) = (var, Lnum val)
+
 sf_let :: SpecialForm
+sf_let venv args =
+    let argsPair = extract_args_let args 
+        var = fst argsPair
+        val = snd argsPair
+    in
+        Lpending (Lelab (\exp -> Llet var val (s2l venv exp))) 
 sf_let _venv _decls = error "¡¡COMPLÉTER!! sf_let"
 
 sf_quote :: SpecialForm

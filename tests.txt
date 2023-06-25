@@ -1,0 +1,16 @@
+;;Tests pour TP2 du site web du cours
+;;run "C:\\Users\\15146\\OneDrive\\Desktop\\Psil Interpreter\\test.txt"
+
+(def r1 2)                                       ; ↝ 2 : Int ; 2:Tprim "Int"
+
+(def r2 +)                                       ; ↝ <fonction> : Int -> Int -> Int
+(def r3 (+ 2))                                   ; ↝ <fonction> : Int -> Int
+
+(def r4 (+ (: 2 Int)))                           ; ↝ <fonction> : Int -> Int
+
+(def r5 ((+ 2) 4))                               ; ↝ 6 : Int
+
+(dec r6 Int)
+(def r6 (+ 2 5))                                 ; ↝ 7 : Int
+
+(def r7 (let ((x 5)) (* x 4)))                   ; ↝ 20 : Int  ; LATEST ERROR, complete sf_let
