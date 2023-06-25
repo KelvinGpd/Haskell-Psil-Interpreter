@@ -410,6 +410,11 @@ synth tenv (Lapp e1 e2) =
       _ -> error ("Not a function: " ++ show e1)
 synth tenv (Llet x e1 e2) = synth (minsert tenv x (synth tenv e1)) e2
 -- ¡¡COMPLÉTER!!
+
+--Solution temporaire
+synth tenv (Lquote e) = pt_int
+
+
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
 
@@ -536,6 +541,10 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 eval venv (Lhastype e _) = eval venv e
+
+eval venv (Lapp ( Lpending (Lelab func) ) arg) = eval venv (func (p2h_sexp (eval venv arg)))
+eval venv (Lquote e) = e
+
 eval venv (Lapp e1 e2) =
     let argValue = eval venv e2
     in case eval venv e1 of
@@ -543,8 +552,17 @@ eval venv (Lapp e1 e2) =
         other -> error ("Trying to call a non-function: " ++ show other)
 eval venv (Llet x e1 e2) = eval (minsert venv x (eval venv e1)) e2
 eval venv (Lfun x e) = Vfun (\ v -> eval (minsert venv x v) e)
+
+
+
+
 eval _ (Lpending e) = error ("Expression incomplète: " ++ show e)
 -- ¡¡COMPLÉTER!!
+--SAM
+--Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
+--Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (eval venv (s2l venv x)))))
+
+
 
 -- État de l'évaluateur.
 type EState = ((TEnv, VEnv),       -- Contextes de typage et d'évaluation.
