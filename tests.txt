@@ -23,6 +23,11 @@
 (dec recursive Int)
 (def recursive (f1 recursive 37))                ; ↝ 42 : Int
 
-;; Une macro triviale.                           ; LATEST ERROR
+;; Une macro triviale.                          
 (def macro-id (macro (fun s s)))
 (def cinq (macro-id 5))
+
+;; Macro moins triviale: `fun` avec arguments inversés!  ; LATEST ERROR
+(def revfun
+     (macro (fun body (moremacro
+                      (fun arg (cons (cons 'fun arg) body))))))
