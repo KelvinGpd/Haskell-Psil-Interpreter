@@ -1,5 +1,6 @@
 ;;Tests pour TP2 du site web du cours
 ;;run "C:\\Users\\15146\\OneDrive\\Desktop\\Psil Interpreter\\test.txt"
+;;run "C:\\Users\\leuma\\Documents\\UDEM 2023\\2035\\Haskell-Psil-Interpreter\\tests.txt"
 
 (def r1 2)                                       ; ↝ 2 : Int ; 2:Tprim "Int"
 

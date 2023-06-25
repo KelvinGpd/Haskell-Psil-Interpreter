@@ -328,6 +328,9 @@ h2l venv (s@(Ssym name)) =
     case mmlookup venv name of
       Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
       -- ¡¡COMPLÉTER!!  Just (Vobj "macro" [Vfun macroexpander]) ->
+
+      Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (eval venv (s2l venv x)))))
+
       _ -> s2l venv s
 h2l venv (Scons s1 s2) =
     case h2l venv s1 of
