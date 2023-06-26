@@ -31,3 +31,5 @@
 (def revfun
      (macro (fun body (moremacro
                       (fun arg (cons (cons 'fun arg) body))))))
+(def r9 (: (revfun (+ x 7) x) (Int -> Int)))
+(def r10 (r9 6))

@@ -324,15 +324,15 @@ sf_quote _venv s = Lquote (h2p_sexp s)
 -- forme spéciale pour la stocker dans une autre variable.
 h2l :: VEnv -> Sexp -> Lexp
 h2l venv Snil = Lpending (Lelab (h2l venv))
+
+
 h2l venv (s@(Ssym name)) =
     case mmlookup venv name of
       Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
       -- ¡¡COMPLÉTER!!  Just (Vobj "macro" [Vfun macroexpander]) ->
-      Just (Vobj "macro" [Vfun macroexpander]) ->
-        case macroexpander of
-            --Just (Vobj "moremacro" _ ) -> Lpending (Lelab (\x -> Lpending(Lelab (\y -> h2l venv (p2h_sexp macroexpander))(h2p_sexp y))(h2p_sexp x)))
-            Just (Vobj "moremacro" [Vfun moremacroexpender] ) -> Lpending (Lelab (\x -> (h2l venv (p2h_sexp (macroexpander (h2p_sexp x))))))
-            _ -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
+      Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
+
+
       _ -> s2l venv s
 h2l venv (Scons s1 s2) =
     case h2l venv s1 of
@@ -414,9 +414,13 @@ synth tenv (Llet x e1 e2) = synth (minsert tenv x (synth tenv e1)) e2
 -- ¡¡COMPLÉTER!!
 
 --Solution temporaire
-synth tenv (Lquote e) = pt_int
-
-
+synth tenv (Lquote e) =     
+    case e of
+        Vnum _ -> pt_int
+        Vsf _ _ -> pt_string
+        Vfun _ -> Tarw pt_sexp pt_sexp
+        Vobj _ _ -> pt_sexp
+        _ -> error ("Valeure innatendue" ++ (show e))
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
 
@@ -529,6 +533,7 @@ env0 =
         -- Les macros.
         ("macro", Tarw (Tarw pt_sexp pt_sexp) pt_macro,
          Vfun (\expander -> Vobj "macro" [expander])),
+
         ("moremacro", Tarw (Tarw pt_sexp pt_sexp) pt_sexp,
          Vfun (\expander -> Vobj "moremacro" [expander]))]
 
@@ -545,7 +550,10 @@ eval venv (Lvar x) = mlookup venv x
 eval venv (Lhastype e _) = eval venv e
 
 eval venv (Lapp ( Lpending (Lelab func) ) arg) = eval venv (func (p2h_sexp (eval venv arg)))
-eval venv (Lquote e) = e
+eval venv (Lquote e) = 
+    case e of 
+    Vobj "moremacro" [Vfun expender] -> Vfun (\x -> (eval venv (Lquote (expender x))))
+    _ -> eval venv (h2l venv (p2h_sexp e))
 
 eval venv (Lapp e1 e2) =
     let argValue = eval venv e2
@@ -563,7 +571,6 @@ eval _ (Lpending e) = error ("Expression incomplète: " ++ show e)
 --SAM
 --Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
 --Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (eval venv (s2l venv x)))))
-
 
 
 -- État de l'évaluateur.
