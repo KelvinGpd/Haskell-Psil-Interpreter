@@ -297,15 +297,19 @@ sf_fun venv (Ssym x) =
 sf_fun _ x = error ("devrait être un identifiant: " ++ showSexp x)
 
 sf_if :: SpecialForm
+sf_if venv condition = 
+    Lpending(Lelab(\ontrue -> Lpending(Lelab (\onfalse -> Lif (s2l venv condition) (s2l venv ontrue) (s2l venv onfalse)))))
 sf_if _venv _sc =  error "¡¡COMPLÉTER!! sf_if"
+-- Scons (Scons Snil (Ssym "nil?")) (Ssym "head")
 
 --fonction auxilliaire 
-extract_args_let :: Sexp -> (String, Lexp)
-extract_args_let (Scons Snil (Scons (Scons Snil (Ssym var)) (Snum val))) = (var, Lnum val)
+extract_args :: Sexp -> (String, Lexp)
+extract_args (Scons Snil (Scons (Scons Snil (Ssym var)) (Snum val))) = (var, Lnum val)
+--extract_args (Scons (Scons Snil (Ssym condition)) (Ssym var)) = (condition, var)
 
 sf_let :: SpecialForm
 sf_let venv args =
-    let argsPair = extract_args_let args 
+    let argsPair = extract_args args 
         var = fst argsPair
         val = snd argsPair
     in
@@ -331,8 +335,6 @@ h2l venv (s@(Ssym name)) =
       Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
       -- ¡¡COMPLÉTER!!  Just (Vobj "macro" [Vfun macroexpander]) ->
       Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
-
-
       _ -> s2l venv s
 h2l venv (Scons s1 s2) =
     case h2l venv s1 of
