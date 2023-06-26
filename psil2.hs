@@ -300,7 +300,6 @@ sf_if :: SpecialForm
 sf_if venv condition = 
     Lpending(Lelab(\ontrue -> Lpending(Lelab (\onfalse -> Lif (s2l venv condition) (s2l venv ontrue) (s2l venv onfalse)))))
 sf_if _venv _sc =  error "¡¡COMPLÉTER!! sf_if"
--- Scons (Scons Snil (Ssym "nil?")) (Ssym "head")
 
 --fonction auxilliaire 
 extract_args :: Sexp -> (String, Lexp)
@@ -423,6 +422,12 @@ synth tenv (Lquote e) =
         Vfun _ -> Tarw pt_sexp pt_sexp
         Vobj _ _ -> pt_sexp
         _ -> error ("Valeure innatendue" ++ (show e))
+
+synth tenv (Lif cond val1 val2) = 
+    case synth tenv cond of
+        p_true -> synth tenv val1
+        p_false -> synth tenv val2
+        
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
 
@@ -550,6 +555,11 @@ eval :: VEnv -> Lexp -> Value
 eval _venv (Lnum n) = Vnum n
 eval venv (Lvar x) = mlookup venv x
 eval venv (Lhastype e _) = eval venv e
+
+eval venv (Lif cond val1 val2) = 
+    case eval venv cond of
+        p_true -> eval venv val1
+        p_false -> eval venv val2
 
 eval venv (Lapp ( Lpending (Lelab func) ) arg) = eval venv (func (p2h_sexp (eval venv arg)))
 eval venv (Lquote e) = 

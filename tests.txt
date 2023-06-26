@@ -36,20 +36,5 @@
 
 (def r11(if (true) (4) (3)))
 
-;; Utiliser `macro` + `fun` + `moremacro` pour recevoir les différents
-;; arguments, c'est fatigant.  Définissons une macro
-;; (multi-macro ARGS BODY) qui fait ça pour nous.
-(def multi-macro
-     (macro (fun args
-                 (moremacro
-                  (fun body
-                       (let ((head (car args)))
-                         (let ((tail (cdr args)))
-                           (let ((tailfun (cons (cons 'fun tail) body)))
-                             (if (nil? head)
-                                 (cons 'macro tailfun)
-                               (cons (cons 'multi-macro head)
-                                     (cons 'moremacro tailfun)))))))))))
-
 
 
