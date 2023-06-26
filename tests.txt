@@ -34,7 +34,21 @@
 ;;(def r9 (: (revfun (+ x 7) x) (Int -> Int)))
 ;;(def r10 (r9 6))                                 ; ↝ 13 : Int 
 
-(def r11(if (true) (4) (3)))
+(def r11(if (true) (4) (5)))                       ; ↝ 4 : Int --> My own Test Case for Lif 
 
+;; Utiliser `macro` + `fun` + `moremacro` pour recevoir les différents  ;LATEST ERROR
+;; arguments, c'est fatigant.  Définissons une macro
+;; (multi-macro ARGS BODY) qui fait ça pour nous.
+(def multi-macro
+     (macro (fun args
+                 (moremacro
+                  (fun body
+                       (let ((head (car args)))
+                         (let ((tail (cdr args)))
+                           (let ((tailfun (cons (cons 'fun tail) body)))
+                             (if (nil? head)
+                                 (cons 'macro tailfun)
+                               (cons (cons 'multi-macro head)
+                                     (cons 'moremacro tailfun)))))))))))
 
 

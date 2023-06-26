@@ -424,10 +424,18 @@ synth tenv (Lquote e) =
         _ -> error ("Valeure innatendue" ++ (show e))
 
 synth tenv (Lif cond val1 val2) = 
-    case synth tenv cond of
-        p_true -> synth tenv val1
-        p_false -> synth tenv val2
-        
+    let 
+        type1 = synth tenv val1 
+        type2 = synth tenv val2
+    in
+        if (type1 == type2)
+            then
+                case synth tenv cond of
+                    pt_bool -> type1
+                    _ -> error ("condition does not evaluate to a bool")
+            else
+                error("both branches must be of same type")
+
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
 
