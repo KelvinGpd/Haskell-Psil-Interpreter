@@ -36,8 +36,7 @@
 
 (def r11(if (true) (4) (5)))                       ; ↝ 4 : Int --> My own Test Case for Lif 
 
-;; Utiliser `macro` + `fun` + `moremacro` pour recevoir les différents  ;LATEST ERROR
-;; arguments, c'est fatigant.  Définissons une macro
+;; Utiliser `macro` + `fun` + `moremacro` pour recevoir les différents  
 ;; (multi-macro ARGS BODY) qui fait ça pour nous.
 (def multi-macro
      (macro (fun args
@@ -50,5 +49,7 @@
                                  (cons 'macro tailfun)
                                (cons (cons 'multi-macro head)
                                      (cons 'moremacro tailfun)))))))))))
+
+
 
 

@@ -301,19 +301,21 @@ sf_if venv condition =
     Lpending(Lelab(\ontrue -> Lpending(Lelab (\onfalse -> Lif (s2l venv condition) (s2l venv ontrue) (s2l venv onfalse)))))
 sf_if _venv _sc =  error "¡¡COMPLÉTER!! sf_if"
 
---fonction auxilliaire 
-extract_args :: Sexp -> (String, Lexp)
-extract_args (Scons Snil (Scons (Scons Snil (Ssym var)) (Snum val))) = (var, Lnum val)
---extract_args (Scons (Scons Snil (Ssym condition)) (Ssym var)) = (condition, var)
-
 sf_let :: SpecialForm
 sf_let venv args =
-    let argsPair = extract_args args 
-        var = fst argsPair
-        val = snd argsPair
+    let  
+        argslist = sexp2list(args) -- [Scons (Scons Snil (Ssym "x")) (Snum 5), Scons (Scons Snil (Ssym "y")) (Snum 5)]
+        afflist = map sexp2list argslist -- extracts single Ssyms and their affection [[Ssym "x", Snum 5],[Ssym "y", Snum 5]]
     in
-        Lpending (Lelab (\exp -> Llet var val (s2l venv exp))) 
+        Lpending (Lelab (\exp -> extract_aff venv afflist exp))
 sf_let _venv _decls = error "¡¡COMPLÉTER!! sf_let"
+
+extract_aff :: VEnv -> [[Sexp]] -> Sexp -> Lexp
+extract_aff venv [] exp = (s2l venv exp)
+extract_aff venv (x:xs) exp = 
+    case x of
+        [Ssym var, Snum val] -> Llet var (Lnum val) (extract_aff venv xs exp)
+        [Ssym var, truc] -> Llet var (s2l venv truc) (extract_aff venv xs exp)
 
 sf_quote :: SpecialForm
 sf_quote _venv s = Lquote (h2p_sexp s)
@@ -418,9 +420,10 @@ synth tenv (Llet x e1 e2) = synth (minsert tenv x (synth tenv e1)) e2
 synth tenv (Lquote e) =     
     case e of
         Vnum _ -> pt_int
-        Vsf _ _ -> pt_string
+        Vstr _ -> pt_string
         Vfun _ -> Tarw pt_sexp pt_sexp
-        Vobj _ _ -> pt_sexp
+        Vsf _ _ -> pt_sf
+        Vobj name args -> pt_sexp
         _ -> error ("Valeure innatendue" ++ (show e))
 
 synth tenv (Lif cond val1 val2) = 
