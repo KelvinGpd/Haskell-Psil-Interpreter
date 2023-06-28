@@ -335,7 +335,11 @@ h2l venv (s@(Ssym name)) =
     case mmlookup venv name of
       Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
       -- ¡¡COMPLÉTER!!  Just (Vobj "macro" [Vfun macroexpander]) ->
-      Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
+      Just (Vobj "macro" [Vfun macroexpander]) -> 
+        case macroexpander of
+            ((Vobj "moremacro" [Vfun moremacroexpander])) -> Lpending (Lelab (\x -> (Lpending Lelab(\y -> recursiveLexpend moremacroexpander (macroexpander x y)))))
+            _ -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
+        
       _ -> s2l venv s
 h2l venv (Scons s1 s2) =
     case h2l venv s1 of
@@ -343,8 +347,11 @@ h2l venv (Scons s1 s2) =
       _ -> Lapp (s2l venv s1) (s2l venv s2)
 h2l venv s = s2l venv s
 
+recursiveLexpend:: VEnv -> Value -> Lexp
+
+
 -- Élaboration d'une Sexp qui n'est pas en position de "tête".
-s2l :: VEnv -> Sexp -> Lexp
+s2l :: VEnv -> Value -> Value
 s2l _ (Snum n) = Lnum n
 s2l _ (Ssym s) = Lvar s
 s2l venv (s@(Scons _ _)) =
@@ -426,6 +433,9 @@ synth tenv (Lquote e) =
         Vobj name args -> pt_sexp
         _ -> error ("Valeure innatendue" ++ (show e))
 
+synth tenv (Lpending (Lelab e)) =     
+    Tarw pt_sexp (synth tenv (e (Snum 2)))
+
 synth tenv (Lif cond val1 val2) = 
     let 
         type1 = synth tenv val1 
@@ -438,6 +448,7 @@ synth tenv (Lif cond val1 val2) =
                     _ -> error ("condition does not evaluate to a bool")
             else
                 error("both branches must be of same type")
+
 
 synth _tenv e = error ("Incapable de trouver le type de: " ++ (show e))
 
@@ -572,10 +583,9 @@ eval venv (Lif cond val1 val2) =
         p_true -> eval venv val1
         p_false -> eval venv val2
 
-eval venv (Lapp ( Lpending (Lelab func) ) arg) = eval venv (func (p2h_sexp (eval venv arg)))
-eval venv (Lquote e) = 
-    case e of 
-    Vobj "moremacro" [Vfun expender] -> Vfun (\x -> (eval venv (Lquote (expender x))))
+eval venv (Lapp (Lquote e) arg) =
+    case e of
+    Vobj "moremacro" [Vfun expender] -> eval venv (Lquote (expender (eval venv arg)))
     _ -> eval venv (h2l venv (p2h_sexp e))
 
 eval venv (Lapp e1 e2) =
@@ -583,9 +593,25 @@ eval venv (Lapp e1 e2) =
     in case eval venv e1 of
         Vfun f -> f argValue
         other -> error ("Trying to call a non-function: " ++ show other)
+        
 eval venv (Llet x e1 e2) = eval (minsert venv x (eval venv e1)) e2
 eval venv (Lfun x e) = Vfun (\ v -> eval (minsert venv x v) e)
 
+eval venv (Lquote e) = 
+    case e of 
+    Vobj "moremacro" [Vfun expender] -> error "Macro call sans autre arguments"
+    Vnum i -> Vnum i
+    Vfun func -> Vfun func
+    Vsf str form -> eval venv (h2l venv (p2h_sexp e))
+    Vobj str truc -> e
+    _ -> e
+
+
+-- data Value = Vnum Int
+--            | Vstr String
+--            | Vfun (Value -> Value)
+--            | Vsf String SpecialForm
+--            | Vobj String [Value]
 
 
 

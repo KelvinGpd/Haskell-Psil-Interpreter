@@ -31,8 +31,8 @@
 (def revfun
      (macro (fun body (moremacro
                       (fun arg (cons (cons 'fun arg) body))))))
-;;(def r9 (: (revfun (+ x 7) x) (Int -> Int)))
-;;(def r10 (r9 6))                                 ; ↝ 13 : Int 
+(def r9 (: (revfun (+ x 7) x) (Int -> Int)))
+(def r10 (r9 6))                                 ; ↝ 13 : Int 
 
 (def r11(if (true) (4) (5)))                       ; ↝ 4 : Int --> My own Test Case for Lif 
 
