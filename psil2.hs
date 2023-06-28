@@ -265,6 +265,8 @@ p2h_sexp (Vobj "nil" []) = Snil
 p2h_sexp (Vobj "sym" [Vstr s]) = Ssym s
 p2h_sexp (Vobj "cons" [v1, v2]) = Scons (p2h_sexp v1) (p2h_sexp v2)
 p2h_sexp (Vobj "moremacro" _) = error "moremacro inattendu"
+--Illegal mais pr linstant
+p2h_sexp (Vsf fun wtf) = error "Salut kelv, c ici que sa crash et c called par ligne 606, qui a un Vobj avec des Scons qui contient un Vsf"
 p2h_sexp v = error ("Pas une Sexp: " ++ show v)
                     
 ---------------------------------------------------------------------------
@@ -581,7 +583,7 @@ eval venv (Lif cond val1 val2) =
 eval venv (Lapp (Lquote e) arg) =
     case e of
     Vobj "moremacro" [Vfun expender] -> eval venv (Lquote (expender (eval venv arg)))
-    _ -> eval venv (h2l venv (p2h_sexp e))
+    _ -> eval venv (s2l venv (p2h_sexp e))
 
 eval venv (Lapp e1 e2) =
     let argValue = eval venv e2
@@ -597,9 +599,12 @@ eval venv (Lquote e) =
     Vobj "moremacro" [Vfun expender] -> error "Macro call sans autre arguments"
     Vnum i -> Vnum i
     Vfun func -> Vfun func
-    Vsf str form -> eval venv (h2l venv (p2h_sexp e))
-    Vobj str truc -> e
-    _ -> e
+    Vsf str form -> error "not indeed"
+    Vobj str truc -> 
+        case str of
+            "fun" -> error "Wdaboo"
+            _ -> eval venv (s2l venv (p2h_sexp e))
+    _ -> eval venv (s2l venv (p2h_sexp e))
 
 
 -- data Value = Vnum Int
