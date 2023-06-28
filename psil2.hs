@@ -335,11 +335,7 @@ h2l venv (s@(Ssym name)) =
     case mmlookup venv name of
       Just (Vsf _ sf) -> Lpending (Lelab (sf venv))
       -- ¡¡COMPLÉTER!!  Just (Vobj "macro" [Vfun macroexpander]) ->
-      Just (Vobj "macro" [Vfun macroexpander]) -> 
-        case macroexpander of
-            ((Vobj "moremacro" [Vfun moremacroexpander])) -> Lpending (Lelab (\x -> (Lpending Lelab(\y -> recursiveLexpend moremacroexpander (macroexpander x y)))))
-            _ -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
-        
+      Just (Vobj "macro" [Vfun macroexpander]) -> Lpending (Lelab (\x -> Lquote (macroexpander (h2p_sexp x))))
       _ -> s2l venv s
 h2l venv (Scons s1 s2) =
     case h2l venv s1 of
@@ -347,11 +343,10 @@ h2l venv (Scons s1 s2) =
       _ -> Lapp (s2l venv s1) (s2l venv s2)
 h2l venv s = s2l venv s
 
-recursiveLexpend:: VEnv -> Value -> Lexp
 
 
 -- Élaboration d'une Sexp qui n'est pas en position de "tête".
-s2l :: VEnv -> Value -> Value
+s2l :: VEnv -> Sexp -> Lexp
 s2l _ (Snum n) = Lnum n
 s2l _ (Ssym s) = Lvar s
 s2l venv (s@(Scons _ _)) =
