@@ -391,6 +391,28 @@ check tenv (Lfun x e) (Tarw t1 t2) =
     check (minsert tenv x t1) e t2
 check _ (Lfun _ _) t =
     error ("Type invalide pour Lfun (n'est pas de la forme t1->t2): " ++ show t)
+
+check tenv (Lquote e) t = 
+    case e of
+        Vobj "macro" _ -> pt_macro
+        _ -> pt_sexp
+
+check tenv (Lif exp1 exp2 exp3) t =
+    let
+        t1 = synth tenv exp2
+        t2 = synth tenv exp3
+        bool = synth tenv exp1
+
+    in if (t1 == t2 && bool == pt_bool) then Nothing
+    else Just ("La condition n'est pas un boolean ou les deux valeurs de if ne sont pas les memes")
+
+
+
+check tenv (Lpending (Lelab e)) t =
+    let t' = synth tenv (e (Ssym "x"))
+    in if t == t' then Nothing
+    else Just ("Erreur de type"++ show t ++ " ≠ " ++ show t')
+
 -- ¡¡COMPLÉTER!!
 check tenv e t
   -- Essaie d'inférer le type et vérifie alors s'il correspond au
@@ -428,8 +450,9 @@ synth tenv (Lquote e) =
         Vobj name args -> pt_sexp
         _ -> error ("Valeure innatendue" ++ (show e))
 
+--Un lpending prend necessairement un Sexp et le transforme en Ltype. Pour trouver le return type, on lui donne un variable random
 synth tenv (Lpending (Lelab e)) =     
-    Tarw pt_sexp pt_sexp
+    Tarw pt_sexp (synth tenv (e (Ssym "x")))
 
 synth tenv (Lif cond val1 val2) = 
     let 
@@ -582,6 +605,11 @@ eval venv (Lapp (Lquote e) arg) =
     case e of
     Vobj "moremacro" [Vfun expender] -> eval venv (Lquote (expender (eval venv arg)))
     _ -> eval venv (h2l venv (p2h_sexp e))
+
+
+--Passe les arguments donnes au lpendings ?
+eval venv (Lapp (Lpending (Lelab func)) arg) =
+    eval venv (func (p2h_sexp (eval venv arg)))
 
 eval venv (Lapp e1 e2) =
     let argValue = eval venv e2
