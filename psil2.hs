@@ -371,6 +371,15 @@ s2d _venv (Ssym "dec") =
                        Ssym name ->
                          Dpending (Delab (\ e -> Ddec name (s2t e)))
                        _ -> error ("Pas un identifiant: " ++ show v)))
+
+s2d venv (Ssym "defmacro") =
+    Dpending (Delab (\ v ->
+                     case v of
+                       Ssym name ->
+                         Dpending (Delab (\ e -> Ddef name (s2l (minsert venv name (mlookup venv "macro")) e)))
+                       _ -> error ("Pas un identifiant: " ++ show v)))
+
+
 s2d _venv (Ssym _v) = error "¡¡COMPLÉTER!! s2d macros"
 s2d venv (Scons s1 s2) =
     case s2d venv s1 of
@@ -394,8 +403,9 @@ check _ (Lfun _ _) t =
 
 check tenv (Lquote e) t = 
     case e of
-        Vobj "macro" _ -> pt_macro
-        _ -> pt_sexp
+        Vobj "macro" _ -> if pt_sexp == t then Nothing else Just ("Argument qui suit n'est pas Sexp")
+        _ -> Nothing
+
 
 check tenv (Lif exp1 exp2 exp3) t =
     let
